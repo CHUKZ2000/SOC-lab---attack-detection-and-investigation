@@ -1,0 +1,219 @@
+# Sysmon Installation and Configuration on Windows
+
+## Overview
+
+Sysmon (System Monitor) is a Microsoft Sysinternals tool that logs detailed Windows system activity. It helps security professionals detect malicious behavior by recording process creation, network connections, file creation, registry modifications, and more.
+
+---
+
+## Prerequisites
+
+- Windows 10/11 or Windows Server
+- Administrator privileges
+- Internet connection
+- PowerShell or Command Prompt
+
+---
+
+## Step 1 – Download Sysmon
+
+Download Sysmon from the Microsoft Sysinternals website.
+
+https://learn.microsoft.com/en-us/sysinternals/downloads/sysmon
+
+Extract the ZIP file.
+
+```
+Sysmon.exe
+Sysmon64.exe
+Eula.txt
+```
+
+---
+
+## Step 2 – Download the Configuration File
+
+Download the SwiftOnSecurity Sysmon configuration.
+
+https://github.com/SwiftOnSecurity/sysmon-config
+
+Save the file as:
+
+```
+C:\Tools\Sysmon\sysmonconfig-export.xml
+```
+
+---
+
+## Step 3 – Create the Working Folder
+
+```cmd
+mkdir C:\Tools\Sysmon
+```
+
+Copy the following files into the folder:
+
+```
+Sysmon64.exe
+Sysmon.exe
+sysmonconfig-export.xml
+```
+
+---
+
+## Step 4 – Open Command Prompt as Administrator
+
+Search for **Command Prompt**, right-click it, and select **Run as Administrator**.
+
+---
+
+## Step 5 – Navigate to the Folder
+
+```cmd
+cd C:\Tools\Sysmon
+```
+
+Verify the files:
+
+```cmd
+dir
+```
+
+---
+
+## Step 6 – Install Sysmon
+
+```cmd
+Sysmon64.exe -accepteula -i sysmonconfig-export.xml
+```
+
+---
+
+## Step 7 – Verify the Installation
+
+Command Prompt:
+
+```cmd
+sc query Sysmon
+```
+
+PowerShell:
+
+```powershell
+Get-Service Sysmon
+```
+
+The service status should be **Running**.
+
+---
+
+## Step 8 – Open Event Viewer
+
+Navigate to:
+
+```
+Applications and Services Logs
+ └── Microsoft
+      └── Windows
+           └── Sysmon
+                └── Operational
+```
+
+---
+
+## Step 9 – Generate Test Events
+
+```cmd
+ipconfig
+
+whoami
+
+ping google.com
+
+notepad.exe
+```
+
+---
+
+## Step 10 – Verify Events
+
+You should observe:
+
+| Event ID | Description |
+|----------|-------------|
+| 1 | Process Creation |
+| 3 | Network Connection |
+| 11 | File Creation |
+| 13 | Registry Modification |
+| 22 | DNS Query |
+
+---
+
+## Step 11 – View the Current Configuration
+
+```cmd
+Sysmon64.exe -c
+```
+
+---
+
+## Step 12 – Update the Configuration
+
+```cmd
+Sysmon64.exe -c sysmonconfig-export.xml
+```
+
+---
+
+## Step 13 – View Recent Logs
+
+```powershell
+Get-WinEvent -LogName "Microsoft-Windows-Sysmon/Operational" -MaxEvents 20
+```
+
+---
+
+## Step 14 – Uninstall Sysmon
+
+```cmd
+Sysmon64.exe -u
+```
+
+---
+
+## Useful Commands
+
+| Command | Description |
+|---------|-------------|
+| Sysmon64.exe -i config.xml | Install Sysmon |
+| Sysmon64.exe -c config.xml | Update configuration |
+| Sysmon64.exe -c | View configuration |
+| Sysmon64.exe -u | Uninstall Sysmon |
+| sc query Sysmon | Check service |
+| Get-Service Sysmon | Verify service |
+| Get-WinEvent | View Sysmon logs |
+
+---
+
+## Repository Structure
+
+```
+Sysmon-Windows-Installation/
+│
+├── README.md
+├── Config/
+│   └── sysmonconfig-export.xml
+├── Images/
+│   ├── install.png
+│   ├── eventviewer.png
+│   ├── processcreation.png
+│   └── networkconnection.png
+└── LICENSE
+```
+
+---
+
+## References
+
+- Microsoft Sysinternals
+- SwiftOnSecurity Sysmon Configuration
