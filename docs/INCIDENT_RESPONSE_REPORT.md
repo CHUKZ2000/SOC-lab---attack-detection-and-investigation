@@ -51,9 +51,11 @@ The attacker began with a SYN scan to identify open ports on the target, followe
 nmap -sS 10.1.1.105
 nmap -A 10.1.1.105
 ```
-![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/reconnaissance/a%20scan%20.png)
+
+![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/reconnaissance/ss%20scan.png)
 *Figure 1. Initial SYN scan from the attacker host (Kali Linux) showing port 22/tcp open on the target.*
 
+![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/reconnaissance/a%20scan%20.png)
 *Figure 2. Aggressive scan (-A) returning OS fingerprint guesses and SSH service/version banner (OpenSSH for_Windows_7.7).*
 
 Detection query used to identify the scanning activity in Splunk:
@@ -63,6 +65,7 @@ index=sysmon EventCode=3
 | stats dc(DestinationPort) as PortsScanned by SourceIp DestinationIp
 ```
 
+![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/reconnaissance/a%20ssan%20splunk%20.png)
 *Figure 3. Splunk results confirming the scanning source (10.1.1.106) and a one-to-many destination port pattern consistent with reconnaissance.*
 
 ### 3.2 Credential Attack & Initial Access
@@ -73,6 +76,7 @@ Following reconnaissance, the attacker used Hydra to perform a dictionary-based 
 hydra -l username.txt -P passwd.txt -t 4 ssh://10.1.1.105
 ```
 
+![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/brute-force/hydra%20attack%20.png)
 *Figure 4. Hydra output showing a successful credential match — 1 of 1 target compromised, valid password found for account "chukz."*
 
 Windows Event ID 4625 (failed logon) corroborates the brute-force attempts immediately preceding the successful authentication:
@@ -82,6 +86,7 @@ index=wineventlog EventCode=4625
 | stats count by Account_Name Source_Network_Address
 ```
 
+![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/brute-force/hydra%20splunk%20.png)
 *Figure 5. Failed logon events show 4 unsuccessful attempts against the "chukz" account shortly before the successful Hydra authentication.*
 
 This represents a confirmed account compromise rather than a contained attempt: the attacker obtained valid, working credentials and used them to establish an interactive session.
@@ -90,6 +95,7 @@ This represents a confirmed account compromise rather than a contained attempt: 
 
 After authenticating, the attacker (operating as "chukz") spawned a Windows PowerShell session — a common next step for situational awareness, persistence, or lateral movement.
 
+![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/powershell-execution/powershell%20k.png)
 *Figure 6. PowerShell session opened from the compromised "chukz" account.*
 
 The attacker subsequently attempted to run a Base64-encoded command using the -EncodedCommand parameter, a technique frequently used to obscure command intent from logging and signature-based detection. The attempt itself failed with a PowerShell parser error, indicating malformed syntax rather than a successfully executed payload — but the attempt was still captured by command-line logging.
@@ -98,6 +104,7 @@ The attacker subsequently attempted to run a Base64-encoded command using the -E
 index=sysmon EventCode=1 CommandLine="*-EncodedCommand*"
 ```
 
+![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/powershell-execution/power.png)
 *Figure 7. Splunk detection query matching the encoded-command pattern in Sysmon process-creation logs (1 event matched).*
 
 ## 4. Indicators of Compromise
@@ -160,15 +167,19 @@ index=sysmon EventCode=1 CommandLine="*-EncodedCommand*"
 This incident demonstrates a complete, low-complexity attack chain — reconnaissance, credential brute-forcing, initial access, and attempted defense evasion — that was fully visible through Sysmon and Windows Event Log telemetry once centralized in Splunk. The key control gap was the use of a weak, brute-forceable password on an internet-facing-style SSH service with no lockout policy. Implementing the recommendations above (account lockout, stronger credential policy, and proactive brute-force/encoded-command alerting) would have prevented or significantly shortened this attack chain. This exercise validates the SOC lab's detection capability across the full incident lifecycle and provides a template for future detection engineering and tabletop exercises.
 
 ## 8. Splunk Dashboard
-
+![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/splunk-dashboards/dash%201.png)
 *Figure 8. Splunk Dashboard*
 
+![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/splunk-dashboards/dash%202.png)
 *Figure 9. Splunk Dashboard 2*
 
+![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/splunk-dashboards/dash%203.png)
 *Figure 10. Splunk Dashboard 3*
 
+![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/splunk-dashboards/dash%204.png)
 *Figure 11. Splunk Dashboard 4*
 
+![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/splunk-dashboards/dash%205.png)
 *Figure 12. Splunk Dashboard 5*
 
 ---
