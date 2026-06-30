@@ -51,7 +51,7 @@ The attacker began with a SYN scan to identify open ports on the target, followe
 nmap -sS 10.1.1.105
 nmap -A 10.1.1.105
 ```
-
+![A scan](https://github.com/CHUKZ2000/SOC-lab---attack-detection-and-investigation/blob/main/screenshots/reconnaissance/a%20scan%20.png)
 *Figure 1. Initial SYN scan from the attacker host (Kali Linux) showing port 22/tcp open on the target.*
 
 *Figure 2. Aggressive scan (-A) returning OS fingerprint guesses and SSH service/version banner (OpenSSH for_Windows_7.7).*
