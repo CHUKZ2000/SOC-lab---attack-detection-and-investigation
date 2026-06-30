@@ -1,0 +1,2 @@
+index=sysmon EventCode=3
+| stats dc(DestinationPort) as PortsScanned by SourceIp DestinationIp

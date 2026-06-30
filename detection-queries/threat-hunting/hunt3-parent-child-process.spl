@@ -1,0 +1,2 @@
+index=sysmon EventCode=1
+| stats count by ParentImage Image

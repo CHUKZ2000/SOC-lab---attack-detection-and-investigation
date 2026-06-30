@@ -1,0 +1,2 @@
+index=sysmon EventCode=3
+| stats count by SourceIp DestinationPort
