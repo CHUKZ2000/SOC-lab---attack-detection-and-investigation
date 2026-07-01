@@ -1,4 +1,4 @@
-﻿# Splunk Installation and Configuration Guide
+# Splunk Installation and Configuration Guide
 
 ## Lab Architecture
 
